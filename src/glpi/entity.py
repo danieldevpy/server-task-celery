@@ -11,3 +11,4 @@ class DatasRegister(BaseModel):
     unity: str
     reason: str
     desc: str
+    contact: str

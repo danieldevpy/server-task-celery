@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 import time
 from sso.entity import Error, DadosFormSSO
 from selenium.webdriver.support.ui import Select
-from controller.wpp import send_wpp_notification_number
+from controller.requests_api import send_wpp_notification_number, send_wpp_notification_grupo
 
 class SSOFunctions:
 
@@ -22,7 +22,7 @@ class SSOFunctions:
         self.xpath_close = '//*[@id="ctl00_MenuSistema"]/ul/li[8]/a'
 
     def create(self, datas: DadosFormSSO, contact: str):
-        not_permited = ['da', 'do', 'dos', 'das']
+        not_permited = ['da', 'do', 'dos', 'das', '', ' ']
         self.chrome.driver.get('http://192.168.1.250/SSONOVAIGUACU/Gerenciamento/GerenciamentoUsuario.aspx')
         btn_create = self.chrome.get_element(self.xpath_btn_create, By.XPATH)
         self.chrome.driver.execute_script("arguments[0].scrollIntoView(true);", btn_create)
@@ -31,7 +31,7 @@ class SSOFunctions:
         err = None
         login = None
         for index in range(len(name_split) - 1, 0, -1):
-            sobrename = {name_split[index]}
+            sobrename = name_split[index].lower()
             if sobrename not in not_permited:
                 user = f'{name_split[0]}.{sobrename}'
                 err = self.register(datas.name, user, datas.cpf, datas.get_index())
@@ -47,9 +47,11 @@ class SSOFunctions:
         btn_close.click()
         
         if err:
+            send_wpp_notification_grupo(f'Não foi possivel criar o login de {datas.name}, motivo: {err}')
             raise Exception(err.msg)
         if login:
             message = f'Olá, o login foi criado no sistema SSO!! Usuario: {login} Senha: samu192'
+            send_wpp_notification_number(contact, message)
             
         
     def register(self, name: str, login: str, cpf: str, index: int) -> Error:

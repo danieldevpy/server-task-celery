@@ -3,14 +3,22 @@ from controller.driver import ChromeDriverController
 from glpi.controller import GLPIFunctions, DatasRegister, Archive
 from sso.controller import SSOFunctions, DadosFormSSO
 from typing import List
+from celery.backends.database import DatabaseBackend
+
 
 app = Celery(
     'tasks',
     broker='pyamqp://guest@localhost//'
 )
+app.conf.update(
+    result_backend='db+sqlite:///results.sqlite',
+    result_serializer='json',
+)
 
-@app.task(bind=True)
-def task_glpi_create(self, datas: dict, files: List[dict]=None):
+app.conf.database_engine_options = {'echo': True} 
+
+@app.task
+def task_glpi_create(datas: dict, files: List[dict]=None):
     new_datas = DatasRegister(**datas)
     archives = [Archive(file["filename"], file["content"]) for file in files] if files else []
     driver = ChromeDriverController(hadless=True, cache=False)
@@ -18,7 +26,6 @@ def task_glpi_create(self, datas: dict, files: List[dict]=None):
     glpi.login()
     glpi.open_request(new_datas, archives)
     return True
-
 
 @app.task
 def task_sso_create(name: str, cpf: str, cargo: str, contact: str):

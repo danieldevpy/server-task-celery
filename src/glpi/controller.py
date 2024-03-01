@@ -1,7 +1,7 @@
-import tempfile, os
+import tempfile, os, re, base64, json
 from selenium.webdriver.common.by import By
 from typing import List
-from controller.wpp import send_wpp_notification_grupo
+from controller.requests_api import send_wpp_notification_grupo
 from controller.driver import ChromeDriverController
 from glpi.entity import DatasRegister, Archive
 
@@ -53,9 +53,23 @@ class GLPIFunctions:
             self.chrome.driver.execute_script("arguments[0].click();", button)
             msg = ' *CHAMADO ABERTO NO GLPI* \n' + datas.desc.replace('\n', '')
             if not send_wpp_notification_grupo(msg):
-                raise Exception("Não foi possivel enviar a notificação no whatsapp")
+                raise Exception("Não foi possivel enviar a notificação no grupo do whatsapp")
             if self.chrome.driver.title != "Interface simplificada - GLPI": # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! warning
                 raise Exception("Por algum motivo o chamado não foi finalizado")
+            
+            if datas.reason == 'Criação de Login':
+                matches = re.findall(r'\*(.*?)\*', datas.desc)
+                for match in matches:
+                    text = match.strip()
+                    string_split_underscore = text.split('-')[1]
+                    string_split_virgula = string_split_underscore.split(',')
+                    name = string_split_virgula[0][1:]
+                    cpf = string_split_virgula[1][1:]
+                    cargo = string_split_virgula[2][1:]
+                    objeto_json = {"name": name, "cpf": cpf, "cargo": cargo, "contact": datas.contact}
+                    json_codificado = base64.b64encode(json.dumps(objeto_json).encode('utf-8')).decode('utf-8')
+                    send_wpp_notification_grupo(f"*Acesse o link abaixo para criar automaticamente*\nhttp://192.168.1.154:8000/sso/{json_codificado}")
+
         except Exception as e:
             self.chrome.driver.close()
             raise Exception("ERROR OPEN REQUEST - " + str(e))

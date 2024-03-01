@@ -1,5 +1,6 @@
 import requests
 
+
 def send_wpp_notification_grupo(message: str) -> bool:
   
     url = 'http://localhost:8001/send'
