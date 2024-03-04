@@ -3,7 +3,7 @@ import requests
 
 def send_wpp_notification_grupo(message: str) -> bool:
   
-    url = 'http://localhost:8001/send'
+    url = 'http://192.168.1.232:8006/send'
     data = {
         "number": "default",
         "message": message
@@ -15,7 +15,7 @@ def send_wpp_notification_grupo(message: str) -> bool:
         return False
     
 def send_wpp_notification_number(number: str, message:str) -> bool:
-    url = 'http://localhost:8001/sendNew'
+    url = 'http://192.168.1.232:8006/sendNew'
     data = {
         "number": number,
         "message": message
