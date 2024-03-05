@@ -1,12 +1,4 @@
 from dataclasses import dataclass
-from pydantic import BaseModel
-
-
-class DadosAPI(BaseModel):
-    name: str
-    cpf: str
-    cargo: str
-    contact: str
 
 @dataclass
 class Error:

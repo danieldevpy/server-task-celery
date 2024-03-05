@@ -4,7 +4,6 @@ from task import task_glpi_create
 
 router = APIRouter()
 
-
 @router.post("/glpi")
 async def glpi_create(
     unity: str = Form(...),
