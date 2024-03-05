@@ -68,7 +68,7 @@ class GLPIFunctions:
                     cargo = string_split_virgula[2][1:]
                     objeto_json = {"name": name, "cpf": cpf, "cargo": cargo, "contact": datas.contact}
                     json_codificado = base64.b64encode(json.dumps(objeto_json).encode('utf-8')).decode('utf-8')
-                    send_wpp_notification_grupo(f"*Acesse o link abaixo para criar automaticamente*\nhttp://192.168.1.232:8004/sso/{json_codificado}")
+                    send_wpp_notification_grupo(f"*Acesse o link abaixo para criar automaticamente*\nhttp://192.168.1.232:8005/sso/{json_codificado}")
 
         except Exception as e:
             self.chrome.driver.close()
