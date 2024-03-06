@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, Form
 from glpi.controller import Archive, DatasRegister
-from task import task_glpi_create
+from tasks import task_glpi_create
 
 router = APIRouter()
 

@@ -1,9 +1,9 @@
 import tempfile, os, re, base64, json
-from selenium.webdriver.common.by import By
 from typing import List
-from controller.requests_api import send_wpp_notification_grupo
+from selenium.webdriver.common.by import By
 from controller.driver import ChromeDriverController
 from glpi.entity import DatasRegister, Archive
+from controller.response import ResponseController
 
 
 class GLPIFunctions:
@@ -17,7 +17,6 @@ class GLPIFunctions:
         self.name_input = '_uploader_filename[]'
         self.xpath_btn = '//*[@id="itil-form"]/div/div[4]/button'
 
-
     def login(self, user: str = 'Portal Chamado', passw: str = 'Cisbaf2023'):
         try:
             self.chrome.driver.get("http://192.168.1.235/index.php?noAUTO=1")
@@ -28,7 +27,7 @@ class GLPIFunctions:
         except Exception as e:
             raise Exception("ERROR LOGIN - " + str(e))
         
-    def open_request(self, datas: DatasRegister, archives: List[Archive] = None):
+    def open_request(self, datas: DatasRegister, archives: List[Archive] = None) -> ResponseController:
         try:
             self.chrome.driver.get("http://192.168.1.235/front/ticket.form.php")
             self.chrome.set_value(self.name_title_chamado, By.NAME, f'{datas.reason}')
@@ -51,9 +50,7 @@ class GLPIFunctions:
         
             button = self.chrome.get_element(self.xpath_btn, By.XPATH)
             self.chrome.driver.execute_script("arguments[0].click();", button)
-            msg = ' *CHAMADO ABERTO NO GLPI* \n' + datas.desc.replace('\n', '')
-            if not send_wpp_notification_grupo(msg):
-                raise Exception("Não foi possivel enviar a notificação no grupo do whatsapp")
+            message_group =  '*CHAMADO ABERTO NO GLPI* \n' + datas.desc.replace('\n', '')
             if self.chrome.driver.title != "Interface simplificada - GLPI": # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! warning
                 raise Exception("Por algum motivo o chamado não foi finalizado")
             
@@ -68,8 +65,11 @@ class GLPIFunctions:
                     cargo = string_split_virgula[2][1:]
                     objeto_json = {"name": name, "cpf": cpf, "cargo": cargo, "contact": datas.contact}
                     json_codificado = base64.b64encode(json.dumps(objeto_json).encode('utf-8')).decode('utf-8')
-                    send_wpp_notification_grupo(f"*Acesse o link abaixo para criar automaticamente*\nhttp://192.168.1.232:8005/sso/{json_codificado}")
+                    message = f"\n*Acesse o link abaixo para criar automaticamente*\nhttp://192.168.1.232:8005/sso/{json_codificado}"
+                    message_group += message
+
+            return ResponseController(True, message_group)
 
         except Exception as e:
             self.chrome.driver.close()
-            raise Exception("ERROR OPEN REQUEST - " + str(e))
+            return ResponseController(False, "ERROR OPEN REQUEST - " + str(e))

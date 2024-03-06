@@ -3,7 +3,8 @@ from selenium.webdriver.common.by import By
 import time
 from sso.entity import Error, DadosFormSSO
 from selenium.webdriver.support.ui import Select
-from controller.requests_api import send_wpp_notification_number, send_wpp_notification_grupo
+from controller.response import ResponseController
+
 
 class SSOFunctions:
 
@@ -21,38 +22,44 @@ class SSOFunctions:
         self.xpath_btn_save = '//*[@id="ctl00_cphBody_FormView1_InsertButton"]'
         self.xpath_close = '//*[@id="ctl00_MenuSistema"]/ul/li[8]/a'
 
-    def create(self, datas: DadosFormSSO, contact: str):
-        not_permited = ['da', 'do', 'dos', 'das', '', ' ']
-        self.chrome.driver.get('http://192.168.1.250/SSONOVAIGUACU/Gerenciamento/GerenciamentoUsuario.aspx')
-        btn_create = self.chrome.get_element(self.xpath_btn_create, By.XPATH)
-        self.chrome.driver.execute_script("arguments[0].scrollIntoView(true);", btn_create)
-        btn_create.click()
-        name_split = datas.name.split(' ')
-        err = None
-        login = None
-        for index in range(len(name_split) - 1, 0, -1):
-            sobrename = name_split[index].lower()
-            if sobrename not in not_permited:
-                user = f'{name_split[0]}.{sobrename}'
-                err = self.register(datas.name, user, datas.cpf, datas.get_index())
-                if not err.e:
-                    login = user
-                    err = None
-                    break
-            time.sleep(1)
-    
-  
-        btn_close = self.chrome.get_element(self.xpath_close, By.XPATH)
-        self.chrome.driver.execute_script("arguments[0].scrollIntoView(true);", btn_close)            
-        btn_close.click()
+    def create(self, datas: DadosFormSSO) -> ResponseController:
+        try:
+            not_permited = ['da', 'do', 'dos', 'das', '', ' ']
+            self.chrome.driver.get('http://192.168.1.250/SSONOVAIGUACU/Gerenciamento/GerenciamentoUsuario.aspx')
+            btn_create = self.chrome.get_element(self.xpath_btn_create, By.XPATH)
+            self.chrome.driver.execute_script("arguments[0].scrollIntoView(true);", btn_create)
+            btn_create.click()
+            name_split = datas.name.split(' ')
+            err = None
+            login = None
+            for index in range(len(name_split) - 1, 0, -1):
+                sobrename = name_split[index].lower()
+                login = None
+                if sobrename not in not_permited:
+                    user = f'{name_split[0]}.{sobrename}'
+                    err = self.register(datas.name, user, datas.cpf, datas.get_index())
+                    if not err.e:
+                        login = user
+                        err = None
+                        break
+                time.sleep(1)
         
-        if err:
-            send_wpp_notification_grupo(f'Não foi possivel criar o login de {datas.name}, motivo: {err}')
-            raise Exception(err.msg)
-        if login:
-            message = f'Olá, o login foi criado no sistema SSO!! Usuario: {login} Senha: samu192'
-            send_wpp_notification_number(contact, message)
+    
+            btn_close = self.chrome.get_element(self.xpath_close, By.XPATH)
+            self.chrome.driver.execute_script("arguments[0].scrollIntoView(true);", btn_close)            
+            btn_close.click()
             
+            if err:
+                message = f'Não foi possivel criar o login de {datas.name}, motivo: {err}'
+                return ResponseController(False, message)
+
+            if login:
+                message = f'Olá, o login foi criado no sistema SSO!! Usuario: {login} Senha: samu192'
+                return ResponseController(True, message)
+            
+            return ResponseController(False, 'erro desconhecido')
+        except Exception as e:
+            return ResponseController(False, str(e))
         
     def register(self, name: str, login: str, cpf: str, index: int) -> Error:
         self.chrome.clear_and_set_value(self.xpath_input_name, By.XPATH, name)

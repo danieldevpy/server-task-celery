@@ -16,13 +16,18 @@ class ChromeDriverController:
             chrome_options.add_argument("--headless=new")
         if cache:
             chrome_options.add_argument('--user-data-dir=~/.config/google-chrome')
-
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
-        self.driver.get('http://google.com')
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options) 
+        self.driver.get('https://web.whatsapp.com/')
 
     def get_element(self, element_search: str, type: None, time=30):
         element = WebDriverWait(self.driver, time).until(
             EC.visibility_of_element_located((type, element_search))
+        )
+        return element
+    
+    def get_element_with_tuple(self, element, time=30):
+        element = WebDriverWait(self.driver, time).until(
+            EC.visibility_of_element_located(element)
         )
         return element
     
