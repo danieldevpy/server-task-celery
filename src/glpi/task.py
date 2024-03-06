@@ -1,5 +1,5 @@
 from typing import List
-from tasks import app, states
+from tasks import app
 from controller.driver import ChromeDriverController
 from glpi.controller import GLPIFunctions, DatasRegister, Archive
 from notification.task import task_notification_group

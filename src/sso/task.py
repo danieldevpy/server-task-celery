@@ -1,5 +1,5 @@
 from celery.exceptions import Ignore
-from tasks import app, states
+from tasks import app
 from sso.controller import SSOFunctions, DadosFormSSO
 from controller.driver import ChromeDriverController
 from notification.task import task_notification, task_notification_group
