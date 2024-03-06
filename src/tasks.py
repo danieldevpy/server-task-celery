@@ -7,7 +7,6 @@ app = Celery(
 )
 
 app.conf.update(
-    database_engine_options={'echo': True},
     timezone='America/Sao_Paulo',
 )
 
