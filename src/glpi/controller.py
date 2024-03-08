@@ -66,7 +66,7 @@ class GLPIFunctions:
                     objeto_json = {"name": name, "cpf": cpf, "cargo": cargo, "contact": datas.contact}
                     json_codificado = base64.b64encode(json.dumps(objeto_json).encode('utf-8')).decode('utf-8')
                     message = f"\n*Acesse o link abaixo para criar automaticamente*\nhttp://192.168.1.232:8005/sso/{json_codificado}"
-                    message_group += message
+                    # message_group += message
 
             return ResponseController(True, message_group)
 
