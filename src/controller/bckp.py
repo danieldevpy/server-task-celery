@@ -20,6 +20,3 @@ class BackupErros:
         print(path)
         with open(f'{path}/{name}', 'wb') as arquivo:
             arquivo.write(bt)
-
-
-BackupErros.save_image('teste.png', b'teste')
