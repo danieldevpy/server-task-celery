@@ -22,6 +22,7 @@ def task_glpi_create(datas: dict, files: List[dict]=None):
             for archive in archives:
                 BackupErros.save_image(archive.name, archive.bts)
         except: pass
+        response = glpi.open_request(new_datas)
         raise Exception(response.message)
     
 
