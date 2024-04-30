@@ -23,6 +23,11 @@ def task_glpi_create(datas: dict, files: List[dict]=None):
                 BackupErros.save_image(archive.name, archive.bts)
         except: pass
         response = glpi.open_request(new_datas)
+        if response.sucess:
+            task_notification_group.delay(response.message)
+            return "Chamado aberto com sucesso"
+        else:
+            task_notification_group.delay("Algum erro ao abrir o chamado no glpi, confira nas tasks do flower")
         raise Exception(response.message)
     
 
