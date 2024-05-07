@@ -39,13 +39,16 @@ class GLPIFunctions:
             
             if archives and len(archives) > 0:
                 for archive in archives:
-                    input = self.chrome.get_element(self.name_input, By.NAME)
                     temp_dir = tempfile.mkdtemp()
                     temp_file_path = os.path.join(temp_dir, archive.name)
                     with open(temp_file_path, 'wb') as temp_file:
                         temp_file.write(archive.bts)
-                    input.send_keys(temp_file_path)
-                    self.chrome.progress_bar('uploadbar', By.CLASS_NAME)
+                    try:
+                        input = self.chrome.get_element(self.name_input, By.NAME)
+                        input.send_keys(temp_file_path)
+                        self.chrome.progress_bar('uploadbar', By.CLASS_NAME)
+                    except:
+                        pass
                     os.remove(temp_file_path)    
         
             button = self.chrome.get_element(self.xpath_btn, By.XPATH)
@@ -54,18 +57,18 @@ class GLPIFunctions:
             if self.chrome.driver.title != "Interface simplificada - GLPI": # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! warning
                 raise Exception("Por algum motivo o chamado não foi finalizado")
             
-            if datas.reason == 'Criação de Login':
-                matches = re.findall(r'\*(.*?)\*', datas.desc)
-                for match in matches:
-                    text = match.strip()
-                    string_split_underscore = text.split('-')[1]
-                    string_split_virgula = string_split_underscore.split(',')
-                    name = string_split_virgula[0][1:]
-                    cpf = string_split_virgula[1][1:]
-                    cargo = string_split_virgula[2][1:]
-                    objeto_json = {"name": name, "cpf": cpf, "cargo": cargo, "contact": datas.contact}
-                    json_codificado = base64.b64encode(json.dumps(objeto_json).encode('utf-8')).decode('utf-8')
-                    message = f"\n*Acesse o link abaixo para criar automaticamente*\nhttp://192.168.1.232:8005/sso/{json_codificado}"
+            # if datas.reason == 'Criação de Login':
+            #     matches = re.findall(r'\*(.*?)\*', datas.desc)
+            #     for match in matches:
+            #         text = match.strip()
+            #         string_split_underscore = text.split('-')[1]
+            #         string_split_virgula = string_split_underscore.split(',')
+            #         name = string_split_virgula[0][1:]
+            #         cpf = string_split_virgula[1][1:]
+            #         cargo = string_split_virgula[2][1:]
+            #         objeto_json = {"name": name, "cpf": cpf, "cargo": cargo, "contact": datas.contact}
+            #         json_codificado = base64.b64encode(json.dumps(objeto_json).encode('utf-8')).decode('utf-8')
+            #         message = f"\n*Acesse o link abaixo para criar automaticamente*\nhttp://192.168.1.232:8005/sso/{json_codificado}"
                     # message_group += message
 
             return ResponseController(True, message_group)

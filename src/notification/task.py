@@ -3,7 +3,7 @@ import requests
 
 @app.task(bind=True)
 def task_notification(self, number: str, message: str):
-    url = 'http://192.168.1.232:8006/sendNew'
+    url = 'http://localhost:8001/sendNew'
     data = {
         "number": number,
         "message": message
@@ -17,7 +17,7 @@ def task_notification(self, number: str, message: str):
 
 @app.task(bind=True)
 def task_notification_group(self, message: str):
-    url = 'http://192.168.1.232:8006/send'
+    url = 'http://localhost:8001/send'
     data = {
         "number": "default",
         "message": message
