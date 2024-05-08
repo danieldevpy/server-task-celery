@@ -5,14 +5,25 @@ from glpi.controller import GLPIFunctions, DatasRegister, Archive
 from notification.task import task_notification_group
 from controller.bckp import BackupErros
 
-@app.task
-def task_glpi_create(datas: dict, files: List[dict]=None):
+@app.task(bind=True, max_retries=3)
+def task_glpi_create(self, datas: dict, files: List[dict]=None):
+    retries = self.request.retries
     new_datas = DatasRegister(**datas)
-    archives = [Archive(file["filename"], file["content"]) for file in files] if files else []
     driver = ChromeDriverController(hadless=True, cache=False)
     glpi = GLPIFunctions(driver)
     glpi.login()
-    response = glpi.open_request(new_datas, archives)
+
+    if retries:
+        if retries == 0:
+            archives = [Archive(file["filename"], file["content"]) for file in files] if files else []
+            response = glpi.open_request(new_datas, archives)
+        else:
+            response = glpi.open_request(new_datas)
+
+    else:
+        archives = [Archive(file["filename"], file["content"]) for file in files] if files else []
+        response = glpi.open_request(new_datas, archives)
+
     if response.sucess:
         task_notification_group.delay(response.message)
         return "Chamado aberto com sucesso"

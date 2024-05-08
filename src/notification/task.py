@@ -1,7 +1,7 @@
 from tasks import app
 import requests
 
-@app.task(bind=True)
+@app.task(bind=True, max_retries=5, retry_delay=120)
 def task_notification(self, number: str, message: str):
     url = 'http://192.168.1.232:8006/sendNew'
     data = {
@@ -15,7 +15,7 @@ def task_notification(self, number: str, message: str):
     else:
         raise Exception(response_message)
 
-@app.task(bind=True)
+@app.task(bind=True, max_retries=5, retry_delay=120)
 def task_notification_group(self, message: str):
     url = 'http://192.168.1.232:8006/send'
     data = {
