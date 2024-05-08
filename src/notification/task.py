@@ -8,12 +8,15 @@ def task_notification(self, number: str, message: str):
         "number": number,
         "message": message
     }
-    response = requests.post(url, json=data)
-    response_message = response.json()['msg']
-    if response.status_code == 200:
-        return response_message
-    else:
-        raise Exception(response_message)
+    try:
+        response = requests.post(url, json=data)
+        response_message = response.json()['msg']
+        if response.status_code == 200:
+            return response_message
+        else:
+            raise Exception(response_message)
+    except requests.RequestException as exc:
+        self.retry(exc=exc)
 
 @app.task(bind=True, max_retries=5, retry_delay=120)
 def task_notification_group(self, message: str):
@@ -22,9 +25,12 @@ def task_notification_group(self, message: str):
         "number": "default",
         "message": message
     }
-    response = requests.post(url, json=data)
-    response_message = response.json()['msg']
-    if response.status_code == 200:
-        return response_message
-    else:
-        raise Exception(response_message)
+    try:
+        response = requests.post(url, json=data)
+        response_message = response.json()['msg']
+        if response.status_code == 200:
+            return response_message
+        else:
+            raise Exception(response_message)
+    except requests.RequestException as exc:
+        self.retry(exc=exc)
