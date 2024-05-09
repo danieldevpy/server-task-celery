@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from tasks import task_sso_create
+
 import json, base64
 
 router = APIRouter()
@@ -12,6 +12,6 @@ async def sso_create(hash: str):
     cpf = json_decodificado['cpf']
     cargo = json_decodificado['cargo']
     contact = json_decodificado['contact']
-    task_sso_create.delay(name, cpf, cargo, contact)
+    # task_sso_create.delay(name, cpf, cargo, contact)
     return "O login seŕa criado e uma mensagem será enviada para o seu whatsapp!"
     

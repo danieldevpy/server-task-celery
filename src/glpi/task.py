@@ -2,7 +2,7 @@ from typing import List
 from tasks import app
 from controller.driver import ChromeDriverController
 from glpi.controller import GLPIFunctions, DatasRegister, Archive
-from notification.task import task_notification_group
+from notification.task import task_notification_wpp
 from controller.bckp import BackupErros
 
 @app.task(bind=True, max_retries=3)
@@ -25,10 +25,10 @@ def task_glpi_create(self, datas: dict, files: List[dict]=None):
         response = glpi.open_request(new_datas, archives)
 
     if response.sucess:
-        task_notification_group.delay(response.message)
+        task_notification_wpp.delay('TI Cisbaf', response.message)
         return "Chamado aberto com sucesso"
     else:
-        task_notification_group.delay("Algum erro ao abrir o chamado no glpi, confira nas tasks do flower")
+        task_notification_wpp.delay('TI Cisbaf', "Algum erro ao abrir o chamado no glpi, confira nas tasks do flower")
         raise Exception(response.message)
     
 

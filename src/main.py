@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from glpi.route import router as routerGLPI
-from sso.route import router as routerSSO
+from notification.route import router as routerNotification
 
 app = FastAPI()
 app.add_middleware(
@@ -13,5 +13,5 @@ app.add_middleware(
 )
 
 app.include_router(routerGLPI)
-app.include_router(routerSSO)
+app.include_router(routerNotification)
 

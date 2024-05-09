@@ -11,5 +11,4 @@ app.conf.update(
 )
 
 from glpi.task import task_glpi_create
-from sso.task import task_sso_create
-from notification.task import task_notification_group, task_notification
+from notification.task import task_notification_wpp
