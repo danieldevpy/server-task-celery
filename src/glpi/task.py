@@ -24,7 +24,7 @@ def task_glpi_create(self, datas: dict, files: List[dict]=None):
 
     else:
         archives = [Archive(file["filename"], file["content"]) for file in files] if files else []
-        response = glpi.open_request(new_datas, archives)
+        response = glpi.open_request(protocolo, new_datas, archives)
 
     if response.sucess:
         task_notification_wpp.delay('TI Cisbaf', response.message)
