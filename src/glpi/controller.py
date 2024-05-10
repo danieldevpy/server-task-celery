@@ -27,10 +27,10 @@ class GLPIFunctions:
         except Exception as e:
             raise Exception("ERROR LOGIN - " + str(e))
         
-    def open_request(self, datas: DatasRegister, archives: List[Archive] = None) -> ResponseController:
+    def open_request(self, protocolo: str, datas: DatasRegister, archives: List[Archive] = None) -> ResponseController:
         try:
             self.chrome.driver.get("http://192.168.1.235/front/ticket.form.php")
-            self.chrome.set_value(self.name_title_chamado, By.NAME, f'{datas.reason}')
+            self.chrome.set_value(self.name_title_chamado, By.NAME, f'{datas.reason} - {protocolo}')
             iframe = self.chrome.get_element(self.css_iframe, By.CLASS_NAME)
             self.chrome.driver.switch_to.frame(iframe)
             paragrafo_element = self.chrome.get_element("p", By.TAG_NAME)
