@@ -15,5 +15,5 @@ def task_notification_wpp(self, number: str, message: str):
             return response_message
         else:
             raise Exception(response_message)
-    except requests.RequestException as exc:
+    except Exception as exc:
         self.retry(exc=exc)
