@@ -3,7 +3,7 @@ import requests
 
 @app.task(bind=True, max_retries=5, retry_delay=120)
 def task_notification_wpp(self, number: str, message: str):
-    url = 'http://192.168.1.232:8006/send'
+    url = 'http://192.168.1.10:8006/notification/wpp'
     data = {
         "number": number,
         "message": message
