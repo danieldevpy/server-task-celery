@@ -27,7 +27,7 @@ def task_glpi_create(self, datas: dict, files: List[dict]=None):
         response = glpi.open_request(protocolo, new_datas, archives)
 
     if response.sucess:
-        task_notification_wpp.delay('TI Cisbaf', response.message)
+        task_notification_wpp.delay('Ti Cisbaf', response.message)
         task_notification_wpp.delay(new_datas.contact, f'O seu chamado foi aberto, caso você não tenha retorno, envie o protocolo #{protocolo} para a equipe de TI')
         return "Chamado aberto com sucesso"
     else:
