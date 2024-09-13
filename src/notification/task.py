@@ -1,7 +1,7 @@
 from tasks import app
 import requests
 
-@app.task(bind=True, max_retries=5, retry_delay=120)
+@app.task(bind=True, max_retries=50, retry_delay=30)
 def task_notification_wpp(self, number: str, message: str):
     url = 'http://192.168.1.10:8006/notification/wpp'
     data = {
